@@ -1,22 +1,18 @@
 const express = require("express");
 const app = express();
 const port = 5000;
-
+const config = require("./config/key");
 const { User } = require("./models/User");
+const mongoose = require("mongoose");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const mongoose = require("mongoose");
-
 mongoose
-  .connect(
-    "mongodb+srv://eunji:379214@cluster0.at4bs.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    }
-  )
+  .connect(config.mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB Connected!"))
   .catch((err) => console.error(err));
 
@@ -33,6 +29,31 @@ app.post("/register", (req, res) => {
       success: true,
     });
   });
+});
+
+app.post("/login", (req, res) => {
+  //데이터베이스에 요청된 이메일을 찾는다
+  User.findOne({ email: req.body.email }, (err, user) => {
+    if (!user) {
+      return res.json({
+        loginSuccess: false,
+        message: "제공된 이메일에 해당하는 유저가 없습니다.",
+      });
+    }
+    //요청된 이메일이 데베에 있으면 맞는 비밀번호 확인
+    user.comparePassword(req.body.password, (err, isMatch) => {
+      if (!isMatch) {
+        return res.json({
+          loginSuccess: false,
+          message: "비밀번호가 틀렸습니다.",
+        });
+      }
+      //비밀번호 까지 맞다면 토큰 생성
+      user.generateToken((err, user) => {});
+    });
+  });
+
+  //비밀번호까지 맞다면 토큰 생성
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}!`));
