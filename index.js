@@ -1,9 +1,10 @@
-const express = require("express");
-const app = express();
+import express from "express";
+import config from "./config/key";
+import mongoose from "mongoose";
+import { User } from "./models/User";
+
 const port = 5000;
-const config = require("./config/key");
-const { User } = require("./models/User");
-const mongoose = require("mongoose");
+const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -33,7 +34,11 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   //데이터베이스에 요청된 이메일을 찾는다
-  User.findOne({ email: req.body.email }, (err, user) => {
+  const {
+    body: { email, password },
+  } = req;
+
+  User.findOne({ email }, (err, user) => {
     if (!user) {
       return res.json({
         loginSuccess: false,
@@ -41,7 +46,7 @@ app.post("/login", (req, res) => {
       });
     }
     //요청된 이메일이 데베에 있으면 맞는 비밀번호 확인
-    user.comparePassword(req.body.password, (err, isMatch) => {
+    user.comparePassword(password, (err, isMatch) => {
       if (!isMatch) {
         return res.json({
           loginSuccess: false,
@@ -52,8 +57,6 @@ app.post("/login", (req, res) => {
       user.generateToken((err, user) => {});
     });
   });
-
-  //비밀번호까지 맞다면 토큰 생성
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}!`));

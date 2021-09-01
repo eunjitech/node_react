@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 const saltRounds = 10;
 
 const userSchema = mongoose.Schema({
@@ -61,6 +61,7 @@ userSchema.methods.comparePassword = function (plainPassword, cb) {
   });
 };
 
-const User = mongoose.model("User", userSchema);
+//스키마를 데이터베이스 서버로 넣어주기 위함
+export const User = mongoose.model("User", userSchema);
 
-module.exports = { User };
+//module.exports = { User };
