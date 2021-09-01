@@ -22,7 +22,7 @@ mongoose
 
 app.get("/", (req, res) => res.send("Hello World"));
 
-app.post("/api/users/register", (req, res) => {
+app.post("/api/user/register", (req, res) => {
   //회원가입할 때 필요한 정보를 클라이언트에서 가져오면 데이터베이스에 넣어준다.
   const user = new User(req.body);
 
@@ -35,7 +35,7 @@ app.post("/api/users/register", (req, res) => {
   });
 });
 
-app.post("/api/users/login", (req, res) => {
+app.post("/api/user/login", (req, res) => {
   //데이터베이스에 요청된 이메일을 찾는다
   const {
     body: { email, password },
@@ -72,7 +72,7 @@ app.post("/api/users/login", (req, res) => {
 
 // role 1 : 어드민 role 2: 특정 부서 어드민
 //role 0 -> 일반, role 0아니면 관리자
-app.get("/api/users/auth", auth, (req, res) => {
+app.get("/api/user/auth", auth, (req, res) => {
   //auth 미들웨어 true후
 
   res.status(200).json({
@@ -84,6 +84,14 @@ app.get("/api/users/auth", auth, (req, res) => {
     lastname: req.user.lastname,
     role: req.user.role,
     image: req.user.image,
+  });
+});
+
+//로그아웃
+app.get("/api/user/logout", auth, (req, res) => {
+  User.findOneAndUpdate({ _id: req.user._id }, { token: "" }, (err, user) => {
+    if (err) return res.json({ success: false, err });
+    return res.status(200).send({ success: true });
   });
 });
 
