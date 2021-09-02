@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "backend": "NODE_ENV=development nodemon --exec babel-node server/index.js --delay 2",
+    "backend": "NODE_ENV=development nodemon --exec babel-node index.js --delay 2",
     "prod": "NODE_ENV=production babel-node index.js",
-    "dev": "concurrently \"npm run backend\" \"npm run start --prefix client\""
+    "dev": "concurrently \"npm run backend\" \"cd ../client && npm run start \""
   },
   "author": "",
   "license": "ISC",
